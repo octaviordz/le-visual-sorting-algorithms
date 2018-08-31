@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2003
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualSortingAlgorithms", "VisualSortingAlgorithms\VisualSortingAlgorithms.csproj", "{AA704580-E286-4CEF-8494-6479219CF6D5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZedGraph", "..\ZedGraph.git\source\ZedGraph\ZedGraph.csproj", "{FC4B0F8F-FECB-41A3-8500-50CA34542941}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZedGraph.WinForms", "..\ZedGraph.git\source\ZedGraph.WinForms\ZedGraph.WinForms.csproj", "{C4BF4643-D108-4A2F-9930-C2A6B9314956}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AA704580-E286-4CEF-8494-6479219CF6D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA704580-E286-4CEF-8494-6479219CF6D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA704580-E286-4CEF-8494-6479219CF6D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA704580-E286-4CEF-8494-6479219CF6D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC4B0F8F-FECB-41A3-8500-50CA34542941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC4B0F8F-FECB-41A3-8500-50CA34542941}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC4B0F8F-FECB-41A3-8500-50CA34542941}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC4B0F8F-FECB-41A3-8500-50CA34542941}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4BF4643-D108-4A2F-9930-C2A6B9314956}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4BF4643-D108-4A2F-9930-C2A6B9314956}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4BF4643-D108-4A2F-9930-C2A6B9314956}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4BF4643-D108-4A2F-9930-C2A6B9314956}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6B4F8D9C-785C-4EA3-AFB8-0DACF0F17E60}
+	EndGlobalSection
+EndGlobal
