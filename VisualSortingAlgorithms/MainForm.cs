@@ -13,10 +13,17 @@ namespace VisualSortingAlgorithms
 {
     public partial class MainForm : Form
     {
+        private WinFormAppPresenter _presenter;
+
         public MainForm()
         {
             InitializeComponent();
-            new WinFormAppPresenter(this);
+            _presenter = new WinFormAppPresenter(this);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            _presenter.Start();
         }
     }
 }
