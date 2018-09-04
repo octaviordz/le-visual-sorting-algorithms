@@ -12,34 +12,38 @@ using System.Windows.Threading;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Collections.Generic;
+using VisualSortingAlgorithms.Boundary;
+using VisualSortingAlgorithms.Control;
 
-namespace VisualSortingAlgorithms.Boundary
+namespace VisualSortingAlgorithms
 {
     internal class ZedGraphPresenter
     {
-        public GraphView GraphView { get; }
+        public SortAlgorithm GraphView { get; }
         public PointPairList Points { get; internal set; }
         public Func<int[], IObservable<ISortAction>> SortFunc { get; internal set; }
-        public Control ZedGraphControl { get { return GraphView.ZedGraphControl; } }
-
+        public IGraphControl ZedGraphControl { get { return null; } }
+        private App _app;
         private const int YMax = 1000;
         private const int StepDelay = 200;
 
-        public ZedGraphPresenter(GraphView graphView)
+        public ZedGraphPresenter(App app, SortAlgorithm graphView)
         {
             GraphView = graphView;
+            _app = app;
         }
 
         public void Start()
         {
-            var z = GraphView.ZedGraphControl;
+            var z = GraphView.GraphControl as ZedGraphControl;
             var p = z.GraphPane;
 
             var cbar = p.CurveList[0];
             var sbar = p.CurveList[1];
             var bar = p.CurveList[2];
 
-            var a = GraphView.Points.Select(it => (int)it.Y).ToArray();
+            var a = _app.Data;
+            //var a = GraphView.Points.Select(it => (int)it.Y).ToArray();
             //Timer(TimeSpan.FromSeconds(10), Scheduler.DispatcherScheduler()).
             //SortFunc(a).ObserveOn(DispatcherScheduler.Current).Subscribe(it =>
             var source = SortFunc(a).SelectMany(it =>
@@ -128,7 +132,7 @@ namespace VisualSortingAlgorithms.Boundary
             });
             var trigger = Observable.Timer(TimeSpan.Zero, TimeSpan.FromMilliseconds(StepDelay));
             var triggeredSource = source.Zip(trigger, (s, _) => s);
-            triggeredSource.Subscribe(it =>
+            var h = triggeredSource.ObserveOn(z).SubscribeOn(z).Subscribe(it =>
             {
                 if (z.InvokeRequired)
                 {
@@ -139,11 +143,12 @@ namespace VisualSortingAlgorithms.Boundary
                     it.Invoke();
                 }
             });
+            //s.Dispose();
         }
 
-        public static ZedGraphControl CreateZedGraph(PointPairList points)
+        public static GraphControl CreateZedGraph()
         {
-            var z = new ZedGraphControl
+            ZedGraphControl z = new GraphControl()
             {
                 Dock = DockStyle.Fill
             };
@@ -155,8 +160,8 @@ namespace VisualSortingAlgorithms.Boundary
             var sbar = p.AddBar("swap", new PointPairList(), Color.Red);
             sbar.Bar.Fill.Type = FillType.Solid;
             sbar.Bar.Border.IsVisible = false;
-
-            var bar = p.AddBar("Data", points, Color.LightBlue);
+            //TODO: new PointPairList()
+            var bar = p.AddBar("Data", new PointPairList(), Color.LightBlue);
             bar.Bar.Fill.Type = FillType.Solid;
             bar.Bar.Border.IsVisible = false;
 
@@ -172,11 +177,10 @@ namespace VisualSortingAlgorithms.Boundary
             p.BarSettings.Type = BarType.Overlay;
             z.IsEnableVZoom = false;
             z.IsEnableZoom = false;
+            z.Dock = DockStyle.None;
 
             z.AxisChange();
-            return z;
+            return (GraphControl)z;
         }
-
-
     }
 }

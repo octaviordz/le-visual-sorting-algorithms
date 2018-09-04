@@ -34,11 +34,7 @@ namespace VisualSortingAlgorithms.Boundary
             //    Console.WriteLine($"Timer:{timer.Timestamp} {timer.Value}");
             //});
 
-            for (int i = 0; i < form.checkedListBox1.Items.Count; i++)
-            {
-                form.checkedListBox1.SetItemChecked(i, true);
-                break;
-            }
+           
             _points = new PointPairList();
             Random rand = new Random(DateTime.UtcNow.Millisecond);
             for (int i = 0; i < 20; i++)
@@ -49,7 +45,7 @@ namespace VisualSortingAlgorithms.Boundary
             
             _zedGraphPresenter = BubbleGraphControlPresenter(_points);
             form.WindowState = FormWindowState.Maximized;
-            form.splitContainer.Panel2.Controls.Add(_zedGraphPresenter.ZedGraphControl);
+            //form.splitContainer.Panel2.Controls.Add(_zedGraphPresenter.ZedGraphControl);
         }
 
         internal void Start()
@@ -59,16 +55,17 @@ namespace VisualSortingAlgorithms.Boundary
 
         private static ZedGraphPresenter BubbleGraphControlPresenter(PointPairList points)
         {
-            var z = ZedGraphPresenter.CreateZedGraph(points);
-            var v = new GraphView(z)
-            {
-                Points = points
-            };
-            var presenter = new ZedGraphPresenter(v)
-            {
-                SortFunc = SortingAlgorithm.BubbleSort,
-            };
-            return presenter;
+            //var z = ZedGraphPresenter.CreateZedGraph(points);
+            //var v = new ISortingGraph(z)
+            //{
+            //    Points = points
+            //};
+            //var presenter = new ZedGraphPresenter(v)
+            //{
+            //    SortFunc = SortingAlgorithm.BubbleSort,
+            //};
+            //return presenter;
+            throw new NotImplementedException();
         }
     }
 }

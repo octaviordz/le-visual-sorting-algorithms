@@ -78,11 +78,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Boundary\WinFormAppPresenter.cs" />
-    <Compile Include="Boundary\GraphView.cs" />
-    <Compile Include="Boundary\ZedGraphPresenter.cs" />
+    <Compile Include="Boundary\IGraphControl.cs" />
+    <Compile Include="Control\App.cs" />
+    <Compile Include="GraphControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GraphControl.Designer.cs">
+      <DependentUpon>GraphControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Control\SortAlgorithm.cs" />
     <Compile Include="Entities\SortingAlgorithm.cs" />
-    <Compile Include="Entities\BubbleSort.cs" />
+    <Compile Include="Entities\SortAction.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,8 +123,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Control\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
