@@ -7,7 +7,6 @@ namespace VisualSortingAlgorithms.Control
 {
     public class SortAlgorithm
     {
-        public int StepDelay { get; internal set; }
         public string Name { get; internal set; }
         public Func<int[], IObservable<ISortAction>> SortFunc { get; internal set; }
     }

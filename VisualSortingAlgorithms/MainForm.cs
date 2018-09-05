@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,14 @@ namespace VisualSortingAlgorithms
         public MainForm()
         {
             InitializeComponent();
-            //var source = Observable.Range(1, 5).SelectMany(it =>
+            //var source = Observable.Create<int>((observer) => {
+            //    observer.OnNext(1);
+            //    observer.OnNext(2);
+            //    observer.OnNext(3);
+            //    observer.OnCompleted();
+            //    return Disposable.Create(() => Console.WriteLine($"Observer has unsubscribed"));
+            //}).SelectMany(it =>
+            ////var source = Observable.Range(1, 5).SelectMany(it =>
             //{
             //    return new List<string>
             //    {
@@ -35,31 +43,25 @@ namespace VisualSortingAlgorithms
             //{
             //    Console.WriteLine("Finally does not work in here");
             //});
-            //triggeredSource.Take(10).Finally(() =>
+            //triggeredSource.Finally(() =>
             //{
             //    Console.WriteLine("Finally");
             //}).Timestamp().Subscribe(timer =>
             //{
             //    Console.WriteLine($"Timer:{timer.Timestamp} {timer.Value}");
+            //},
+            //ex =>
+            //{
+            //    Console.WriteLine($"Error {ex}");
+            //},
+            //() =>
+            //{
+            //    Console.WriteLine($"Complete");
             //});
 
-            _app.OnStopVisualization += _app_OnStopVisualization1;
-            for (int i = 0; i < checkedListBox1.Items.Count; i++)
-            {
-                checkedListBox1.SetItemChecked(i, true);
-                break;
-            }
-            GraphControl graphControl = GraphControl.Create();
-            SortAlgorithm sa = _app.CreateSortAlgorithm("Merge");
-            graphControl.SortAlgorithm = sa;
-            _app.AddGraph(graphControl);
-            splitContainer.Panel2.Controls.Add(graphControl);
-            FitGraphs();
-        }
-
-        private void _app_OnStopVisualization1()
-        {
-            startButton.Text = "&Start";
+            _app.OnStopVisualization.Subscribe(_ => startButton.Text = "&Start");
+            checkedListBox1.SetItemChecked(0, true);
+            delayNumericUpDown.Value = App.DefaultStepDelay;
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -102,7 +104,8 @@ namespace VisualSortingAlgorithms
         }
         private void bigOGraphCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            //var it = _app.SortAlgorithms.
+            _app.ShowBigOGraph();
+            // Observable.FromEvent()
         }
         private void MainForm_Resize(object sender, EventArgs e)
         {
@@ -110,6 +113,10 @@ namespace VisualSortingAlgorithms
         }
         private void FitGraphs()
         {
+            if (mainFlowLayoutPanel.Controls.Count <= 0)
+            {
+                return;
+            }
             int w = splitContainer.Panel2.Width - 40;
             int h = (splitContainer.Panel2.Height / mainFlowLayoutPanel.Controls.Count) - 6;
             for (int i = 0; i < mainFlowLayoutPanel.Controls.Count; i++)

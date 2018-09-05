@@ -15,8 +15,7 @@ namespace VisualSortingAlgorithms.Entities
         {
             var sorted = new int[items.Length];
             items.CopyTo(sorted, 0);
-            return Observable.Create(
-            (IObserver<ISortAction> observer) =>
+            return Observable.Create((IObserver<ISortAction> observer) =>
             {
                 for (int i = 0; i < items.Length; i++)
                 {
@@ -66,8 +65,7 @@ namespace VisualSortingAlgorithms.Entities
         {
             var sorted = new int[items.Length];
             items.CopyTo(sorted, 0);
-            return Observable.Create(
-            (IObserver<ISortAction> observer) =>
+            return Observable.Create((IObserver<ISortAction> observer) =>
             {
                 MergeSort(sorted, 0, sorted.Length - 1, observer);
                 observer.OnNext(new CompleteAction

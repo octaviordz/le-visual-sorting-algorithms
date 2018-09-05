@@ -1,23 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using System.Data;
+using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Windows.Forms;
 using VisualSortingAlgorithms.Boundary;
-using VisualSortingAlgorithms.Entities;
-using System.Reactive.Linq;
-using ZedGraph;
 using VisualSortingAlgorithms.Control;
+using VisualSortingAlgorithms.Entities;
+using ZedGraph;
 
 namespace VisualSortingAlgorithms
 {
     public partial class GraphControl : ZedGraphControl, IGraphControl
     {
         public SortAlgorithm SortAlgorithm { get; set; }
+        public int _stepDelay;
+        public int StepDelay
+        {
+            get
+            {
+                return _stepDelay;
+            }
+            set
+            {
+                _stepDelay = value;
+                _stepTrigger.OnNext(_stepDelay);
+            }
+        }
+        private BehaviorSubject<int> _stepTrigger = new BehaviorSubject<int>(App.DefaultStepDelay);
+
         public int[] Data
         {
             get
@@ -33,19 +46,27 @@ namespace VisualSortingAlgorithms
             set
             {
                 var array = value;
-                var bar = GraphPane.CurveList[2];
+                var bar = MasterPane[0].CurveList[2];
                 bar.Clear();
                 for (int i = 0; i < array.Length; i++)
                 {
                     bar.AddPoint(new PointPair(i + 1, array[i]));
                 }
                 AxisChange();
+                Invalidate();
             }
         }
+        private Subject<bool> _visualizing = new Subject<bool>();
+        public IObservable<bool> Visualizing => _visualizing;
+
         private IDisposable _unsubscribe = null;
         public GraphControl()
         {
             InitializeComponent();
+        }
+        public void BigOGraph()
+        {
+
         }
         public void Start()
         {
@@ -59,7 +80,7 @@ namespace VisualSortingAlgorithms
             var cbar = p.CurveList[0];
             var sbar = p.CurveList[1];
             var bar = p.CurveList[2];
-            
+
             var a = Data;
             //var a = GraphView.Points.Select(it => (int)it.Y).ToArray();
             //Timer(TimeSpan.FromSeconds(10), Scheduler.DispatcherScheduler()).
@@ -165,41 +186,41 @@ namespace VisualSortingAlgorithms
                 }
                 return new List<Action>();
             });
-            var trigger = Observable.Timer(TimeSpan.Zero, TimeSpan.FromMilliseconds(SortAlgorithm.StepDelay));
+
+            var trigger = _stepTrigger.Select(t => Observable.Interval(TimeSpan.FromMilliseconds(t))).
+                Switch();
+            //var trigger = Observable.Timer(
+            //    TimeSpan.Zero,
+            //    TimeSpan.FromMilliseconds(StepDelay));
             var triggeredSource = source.Zip(trigger, (s, _) => s);
-            triggeredSource.Finally(() =>
-            {
-                Program._app.StopVisualization();
-            });
-            source.Finally(() =>
-            {
-                Program._app.StopVisualization();
-            });
-            var h = triggeredSource.Subscribe(it =>
-            {
-                if (z.InvokeRequired)
+            _unsubscribe = triggeredSource.ObserveOn(this).Subscribe(
+                it => it.Invoke(),
+                ex =>
                 {
-                    z.Invoke(it);
-                }
-                else
+                    Console.WriteLine($"Error {ex}");
+                    _visualizing.OnNext(false);
+                },
+                () =>
                 {
-                    it.Invoke();
-                }
-            });
-            _unsubscribe = h;
+                    Console.WriteLine($"Complete");
+                    _visualizing.OnNext(false);
+                });
+            _visualizing.OnNext(true);
         }
         public void Stop()
         {
-            _unsubscribe.Dispose();
+            _unsubscribe?.Dispose();
             _unsubscribe = null;
         }
         public static GraphControl Create()
         {
-            ZedGraphControl z = new GraphControl()
+            GraphControl z = new GraphControl()
             {
                 Dock = DockStyle.Fill
             };
             var p = z.GraphPane;
+            var po = new GraphPane();
+            z.MasterPane.Add(po);
             var cbar = p.AddBar("compare", new PointPairList(), Color.DarkOrange);
             cbar.Bar.Fill.Type = FillType.Solid;
             cbar.Bar.Border.IsVisible = false;
@@ -207,7 +228,7 @@ namespace VisualSortingAlgorithms
             var sbar = p.AddBar("swap", new PointPairList(), Color.Red);
             sbar.Bar.Fill.Type = FillType.Solid;
             sbar.Bar.Border.IsVisible = false;
-            //TODO: new PointPairList()
+
             var bar = p.AddBar("Data", new PointPairList(), Color.LightBlue);
             bar.Bar.Fill.Type = FillType.Solid;
             bar.Bar.Border.IsVisible = false;
@@ -226,7 +247,13 @@ namespace VisualSortingAlgorithms
             z.IsEnableZoom = false;
             z.Dock = DockStyle.None;
 
-            return (GraphControl)z;
+            // Layout the GraphPanes using a default Pane Layout
+            using (Graphics g = z.CreateGraphics())
+            {
+                z.MasterPane.SetLayout(g, PaneLayout.SquareColPreferred);
+            }
+
+            return z;
         }
     }
 }
