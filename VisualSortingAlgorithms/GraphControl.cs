@@ -15,7 +15,33 @@ namespace VisualSortingAlgorithms
 {
     public partial class GraphControl : ZedGraphControl, IGraphControl
     {
-        public SortAlgorithm SortAlgorithm { get; set; }
+        public SortAlgorithm _sortAlgorithm;
+        public SortAlgorithm SortAlgorithm
+        {
+            get
+            {
+                return _sortAlgorithm;
+            }
+            set
+            {
+                _sortAlgorithm = value;
+                GraphPane.Title.Text = _sortAlgorithm.Name;
+                if (_sortAlgorithm.BigOFunc != null)
+                {
+                    var graphPane = MasterPane[1];
+                    var l = graphPane.CurveList[0];
+                    l.Clear();
+                    _sortAlgorithm.BigOFunc().ObserveOn(this).Subscribe(p =>
+                    {
+                        l.AddPoint(new PointPair(p.X, p.Y));
+                    },
+                    () =>
+                    {
+                        AxisChange();
+                    });
+                }
+            }
+        }
         public int _stepDelay;
         public int StepDelay
         {
@@ -30,12 +56,11 @@ namespace VisualSortingAlgorithms
             }
         }
         private BehaviorSubject<int> _stepTrigger = new BehaviorSubject<int>(App.DefaultStepDelay);
-
         public int[] Data
         {
             get
             {
-                var bar = GraphPane.CurveList[2];
+                var bar = GraphPane.CurveList[3];
                 var array = new int[bar.Points.Count];
                 for (int i = 0; i < array.Length; i++)
                 {
@@ -46,7 +71,7 @@ namespace VisualSortingAlgorithms
             set
             {
                 var array = value;
-                var bar = MasterPane[0].CurveList[2];
+                var bar = MasterPane[0].CurveList[3];
                 bar.Clear();
                 for (int i = 0; i < array.Length; i++)
                 {
@@ -79,27 +104,26 @@ namespace VisualSortingAlgorithms
 
             var cbar = p.CurveList[0];
             var sbar = p.CurveList[1];
-            var bar = p.CurveList[2];
+            var setbar = p.CurveList[2];
+            var bar = p.CurveList[3];
 
             var a = Data;
-            //var a = GraphView.Points.Select(it => (int)it.Y).ToArray();
-            //Timer(TimeSpan.FromSeconds(10), Scheduler.DispatcherScheduler()).
-            //SortFunc(a).ObserveOn(DispatcherScheduler.Current).Subscribe(it =>
             var source = SortAlgorithm.SortFunc(a).SelectMany(it =>
             {
-                //var s = new Subject<Action>();
                 if (it is SetAction)
                 {
                     return new List<Action>
                     {
                         () =>
                         {
+                            setbar.Clear();
                             cbar.Clear();
+                            sbar.Clear();
                             for (int i = 0; i < it.Indices.Length; i++)
                             {
                                 var point = bar.Points[it.Indices[i]];
                                 var ipoint = new PointPair(point.X, point.Y);
-                                cbar.AddPoint(ipoint);
+                                setbar.AddPoint(ipoint);
                             }
                             z.Invalidate();
                         },
@@ -111,7 +135,9 @@ namespace VisualSortingAlgorithms
                     {
                         () =>
                         {
+                            setbar.Clear();
                             cbar.Clear();
+                            sbar.Clear();
                             var point1 = bar.Points[it.Index1];
                             var point2 = bar.Points[it.Index2];
                             var ipoint1 = new PointPair(point1.X, point1.Y);
@@ -128,6 +154,7 @@ namespace VisualSortingAlgorithms
                     {
                         () =>
                         {
+                            setbar.Clear();
                             cbar.Clear();
                             sbar.Clear();
                             var point1 = bar.Points[it.Index1];
@@ -140,6 +167,7 @@ namespace VisualSortingAlgorithms
                         },
                         () =>
                         {
+                            setbar.Clear();
                             sbar.Clear();
                             var point1 = bar.Points[it.Index1];
                             var point2 = bar.Points[it.Index2];
@@ -155,14 +183,43 @@ namespace VisualSortingAlgorithms
                         },
                     };
                 }
-                else if (it is AfterSwapAction)
+                else if (it is SwapShiftAction)
                 {
                     return new List<Action>
                     {
                         () =>
                         {
+                            setbar.Clear();
                             cbar.Clear();
                             sbar.Clear();
+                            var point1 = bar.Points[it.Index1];
+                            var point2 = bar.Points[it.Index2];
+                            var ipoint1 = new PointPair(point1.X, point1.Y);
+                            //shift point
+                            cbar.AddPoint(ipoint1);
+                            for (int i = it.Index1; i <= it.Index2; i++)
+                            {
+                                setbar.AddPoint(new PointPair(bar.Points[i].X, bar.Points[i].Y));
+                            }
+                            var ipoint2 = new PointPair(point2.X, point2.Y);
+                            sbar.AddPoint(ipoint2);
+                            z.Invalidate();
+                        },
+                        () =>
+                        {
+                            setbar.Clear();
+                            cbar.Clear();
+                            sbar.Clear();
+                            var point1 = bar.Points[it.Index1];
+                            var y = bar.Points[it.Index2].Y;
+                            //shift point
+                            sbar.AddPoint(new PointPair(point1.X, y));
+                            var barPoints = (IPointListEdit)bar.Points;
+                            for (int i = it.Index2; i > it.Index1; i--)
+                            {
+                                barPoints[i] = new PointPair(barPoints[i].X, barPoints[i - 1].Y);
+                            }
+                            barPoints[it.Index1].Y = y;
                             z.Invalidate();
                         },
                     };
@@ -173,6 +230,7 @@ namespace VisualSortingAlgorithms
                     {
                         () =>
                         {
+                            setbar.Clear();
                             cbar.Clear();
                             sbar.Clear();
                             var barPoints = (IPointListEdit)bar.Points;
@@ -220,7 +278,20 @@ namespace VisualSortingAlgorithms
             };
             var p = z.GraphPane;
             var po = new GraphPane();
+            var c = po.AddCurve(null, new PointPairList(), Color.Black);
+            c.Symbol.Type = SymbolType.None;
+            po.XAxis.Type = AxisType.Linear;
+            po.XAxis.Scale.IsVisible = false;
+            po.XAxis.Title.IsVisible = false;
+            po.XAxis.Scale.MaxAuto = false;
+            po.XAxis.Scale.Max = SortingAlgorithm.BigOXMax;
+            po.YAxis.Type = AxisType.Linear;
+            po.YAxis.Scale.IsVisible = false;
+            po.YAxis.Title.IsVisible = false;
+            po.YAxis.Scale.MaxAuto = false;
+            po.YAxis.Scale.Max = SortingAlgorithm.BigOYMax;
             z.MasterPane.Add(po);
+
             var cbar = p.AddBar("compare", new PointPairList(), Color.DarkOrange);
             cbar.Bar.Fill.Type = FillType.Solid;
             cbar.Bar.Border.IsVisible = false;
@@ -229,11 +300,15 @@ namespace VisualSortingAlgorithms
             sbar.Bar.Fill.Type = FillType.Solid;
             sbar.Bar.Border.IsVisible = false;
 
+            var setbar = p.AddBar("working-set", new PointPairList(), Color.Blue);
+            setbar.Bar.Fill.Type = FillType.Solid;
+            setbar.Bar.Border.IsVisible = false;
+
             var bar = p.AddBar("Data", new PointPairList(), Color.LightBlue);
             bar.Bar.Fill.Type = FillType.Solid;
             bar.Bar.Border.IsVisible = false;
 
-            p.Title.IsVisible = false;
+            p.Title.IsVisible = true;
             p.Legend.IsVisible = false;
             p.XAxis.Title.IsVisible = false;
             p.XAxis.Type = AxisType.Linear;
@@ -250,7 +325,7 @@ namespace VisualSortingAlgorithms
             // Layout the GraphPanes using a default Pane Layout
             using (Graphics g = z.CreateGraphics())
             {
-                z.MasterPane.SetLayout(g, PaneLayout.SquareColPreferred);
+                z.MasterPane.SetLayout(g, false, new int[] { 1, 1 }, new float[] { 2f, 1f});
             }
 
             return z;

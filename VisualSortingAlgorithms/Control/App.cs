@@ -99,12 +99,15 @@ namespace VisualSortingAlgorithms.Control
             {
                 case "MERGE":
                     result.SortFunc = SortingAlgorithm.Merge;
+                    result.BigOFunc = SortingAlgorithm.MergeBigO;
                     break;
                 case "QUICK":
                     result.SortFunc = SortingAlgorithm.Quick;
+                    result.BigOFunc = SortingAlgorithm.MergeBigO;
                     break;
                 case "BUBBLE":
                     result.SortFunc = SortingAlgorithm.Bubble;
+                    result.BigOFunc = SortingAlgorithm.BubbleBigO;
                     break;
             }
             return result;
@@ -112,7 +115,8 @@ namespace VisualSortingAlgorithms.Control
 
         internal void GenerateRandomSeries()
         {
-            Random rand = new Random(DateTime.UtcNow.Millisecond);
+            //Random rand = new Random(DateTime.UtcNow.Millisecond);
+            Random rand = new Random(1);
             var ymin = YMax / 10;
             for (int i = 0; i < XMax; i++)
             {

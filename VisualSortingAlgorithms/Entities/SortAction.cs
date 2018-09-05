@@ -28,7 +28,7 @@ namespace VisualSortingAlgorithms.Entities
         public int[] Indices { get; set; }
         public int[] Items { get; set; }
     }
-    class AfterSwapAction : ISortAction
+    class SwapShiftAction : ISortAction
     {
         public int Index1 { get; set; }
         public int Index2 { get; set; }

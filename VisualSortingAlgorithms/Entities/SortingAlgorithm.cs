@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
+using System.Drawing;
 
 namespace VisualSortingAlgorithms.Entities
 {
     class SortingAlgorithm
     {
+        public const int BigOXMax = 500;
+        public const int BigOYMax = 10000;
         public static IObservable<ISortAction> Bubble(int[] items)
         {
             var sorted = new int[items.Length];
@@ -42,12 +45,6 @@ namespace VisualSortingAlgorithms.Entities
                         var tmp = sorted[idx];
                         sorted[idx] = sorted[idx + 1];
                         sorted[idx + 1] = tmp;
-                        observer.OnNext(new AfterSwapAction
-                        {
-                            Index1 = idx,
-                            Index2 = idx + 1,
-                            Items = sorted,
-                        });
                     }
                 }
                 observer.OnNext(new CompleteAction
@@ -60,6 +57,20 @@ namespace VisualSortingAlgorithms.Entities
                 return Disposable.Create(() => Console.WriteLine($"{nameof(Bubble)}. Observer has unsubscribed"));
             });
 
+        }
+        internal static IObservable<PointF> BubbleBigO()
+        {
+            // BigO(n^2)
+            return Observable.Create((IObserver<PointF> observer) =>
+            {
+                for (int x = 0; x < BigOXMax; x++)
+                {
+                    float y = (x * x);
+                    observer.OnNext(new PointF(x, y));
+                }
+                observer.OnCompleted();
+                return Disposable.Empty;
+            });
         }
         public static IObservable<ISortAction> Merge(int[] items)
         {
@@ -119,13 +130,12 @@ namespace VisualSortingAlgorithms.Entities
             int tmpIndex = 0;
             while ((left <= middle) && (right <= high))
             {
-                //observer.OnNext(new CompareAction
-                //{
-                //    Index1 = left,
-                //    Index2 = right,
-                //    Items = tmp,
-                //});
-                // compare
+                observer.OnNext(new CompareAction
+                {
+                    Index1 = left,
+                    Index2 = right,
+                    Items = tmp,
+                });
                 if (input[left] < input[right])
                 {
                     tmp[tmpIndex] = input[left];
@@ -133,9 +143,9 @@ namespace VisualSortingAlgorithms.Entities
                 }
                 else
                 {
-                    observer.OnNext(new SwapAction
+                    observer.OnNext(new SwapShiftAction
                     {
-                        Index1 = left,
+                        Index1 = left + tmpIndex,
                         Index2 = right,
                         Items = tmp,
                     });
@@ -163,11 +173,19 @@ namespace VisualSortingAlgorithms.Entities
             {
                 input[low + i] = tmp[i];
             }
-            observer.OnNext(new AfterSwapAction
+        }
+        internal static IObservable<PointF> MergeBigO()
+        {
+            // BigO(n log n)
+            return Observable.Create((IObserver<PointF> observer) =>
             {
-                Index1 = 0,
-                Index2 = 0,
-                Items = input,
+                for (int x = 0; x < BigOXMax; x++)
+                {
+                    float y = (float)(x * Math.Log(x));
+                    observer.OnNext(new PointF(x, y));
+                }
+                observer.OnCompleted();
+                return Disposable.Empty;
             });
         }
         public static IObservable<ISortAction> Quick(int[] items)

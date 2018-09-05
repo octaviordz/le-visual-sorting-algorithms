@@ -1,7 +1,6 @@
 ﻿using System;
-using VisualSortingAlgorithms.Boundary;
 using VisualSortingAlgorithms.Entities;
-using ZedGraph;
+using System.Drawing;
 
 namespace VisualSortingAlgorithms.Control
 {
@@ -9,5 +8,6 @@ namespace VisualSortingAlgorithms.Control
     {
         public string Name { get; internal set; }
         public Func<int[], IObservable<ISortAction>> SortFunc { get; internal set; }
+        public Func<IObservable<PointF>> BigOFunc { get; internal set; }
     }
 }
