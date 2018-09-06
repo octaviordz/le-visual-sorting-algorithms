@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Reactive.Disposables;
+using System.Diagnostics;
 using System.Drawing;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 
 namespace VisualSortingAlgorithms.Entities
 {
@@ -54,7 +51,7 @@ namespace VisualSortingAlgorithms.Entities
                     Items = sorted,
                 });
                 observer.OnCompleted();
-                return Disposable.Create(() => Console.WriteLine($"{nameof(Bubble)}. Observer has unsubscribed"));
+                return Disposable.Create(() => Debug.WriteLine($"{nameof(Bubble)}. Observer has unsubscribed"));
             });
 
         }
@@ -86,10 +83,10 @@ namespace VisualSortingAlgorithms.Entities
                     Items = sorted,
                 });
                 observer.OnCompleted();
-                return Disposable.Create(() => Console.WriteLine($"{nameof(Merge)}. Observer has unsubscribed"));
+                return Disposable.Create(() => Debug.WriteLine($"{nameof(Merge)}. Observer has unsubscribed"));
             });
         }
-        private static void MergeSort(int[] input, int low, int high, IObserver<ISortAction> observer)
+        private static void MergeSort(int[] items, int low, int high, IObserver<ISortAction> observer)
         {
             if (low < high)
             {
@@ -102,10 +99,10 @@ namespace VisualSortingAlgorithms.Entities
                 observer.OnNext(new SetAction
                 {
                     Indices = indices,
-                    Items = input,
+                    Items = items,
                 });
-                MergeSort(input, low, middle, observer);
-                MergeSort(input, middle + 1, high, observer);
+                MergeSort(items, low, middle, observer);
+                MergeSort(items, middle + 1, high, observer);
                 indices = new int[(high - low) + 1];
                 for (int i = 0; i < indices.Length; i++)
                 {
@@ -114,12 +111,12 @@ namespace VisualSortingAlgorithms.Entities
                 observer.OnNext(new SetAction
                 {
                     Indices = indices,
-                    Items = input,
+                    Items = items,
                 });
-                Merge(input, low, middle, high, observer);
+                Merge(items, low, middle, high, observer);
             }
         }
-        private static void Merge(int[] input, int low, int middle, int high, IObserver<ISortAction> observer)
+        private static void Merge(int[] items, int low, int middle, int high, IObserver<ISortAction> observer)
         {
             List<int> result = new List<int>();
 
@@ -136,9 +133,9 @@ namespace VisualSortingAlgorithms.Entities
                     Index2 = right,
                     Items = tmp,
                 });
-                if (input[left] < input[right])
+                if (items[left] < items[right])
                 {
-                    tmp[tmpIndex] = input[left];
+                    tmp[tmpIndex] = items[left];
                     left = left + 1;
                 }
                 else
@@ -150,7 +147,7 @@ namespace VisualSortingAlgorithms.Entities
                         Items = tmp,
                     });
                     shiftOnLeftCount += 1;
-                    tmp[tmpIndex] = input[right];
+                    tmp[tmpIndex] = items[right];
                     right = right + 1;
                 }
                 tmpIndex = tmpIndex + 1;
@@ -158,21 +155,21 @@ namespace VisualSortingAlgorithms.Entities
 
             while (left <= middle)
             {
-                tmp[tmpIndex] = input[left];
+                tmp[tmpIndex] = items[left];
                 left = left + 1;
                 tmpIndex = tmpIndex + 1;
             }
 
             while (right <= high)
             {
-                tmp[tmpIndex] = input[right];
+                tmp[tmpIndex] = items[right];
                 right = right + 1;
                 tmpIndex = tmpIndex + 1;
             }
             
             for (int i = 0; i < tmp.Length; i++)
             {
-                input[low + i] = tmp[i];
+                items[low + i] = tmp[i];
             }
         }
         internal static IObservable<PointF> MergeBigO()
@@ -191,7 +188,87 @@ namespace VisualSortingAlgorithms.Entities
         }
         public static IObservable<ISortAction> Quick(int[] items)
         {
-            throw new NotImplementedException();
+            var sorted = new int[items.Length];
+            items.CopyTo(sorted, 0);
+            return Observable.Create((IObserver<ISortAction> observer) =>
+            {
+                QuickSort(sorted, 0, sorted.Length - 1, observer);
+                observer.OnNext(new CompleteAction
+                {
+                    Index1 = 0,
+                    Index2 = 0,
+                    Items = sorted,
+                });
+                observer.OnCompleted();
+                return Disposable.Create(() => Debug.WriteLine($"{nameof(Quick)}. Observer has unsubscribed"));
+            });
+        }
+        private static void QuickSort(int[] items, int low, int high, IObserver<ISortAction> observer)
+        {
+            int p;
+            if (low < high)
+            {
+                p = Partition(items, low, high, observer);
+                QuickSort(items, low, p, observer);
+                QuickSort(items, p + 1, high, observer);
+            }
+        }
+        private static int Partition(int[] items, int low, int high, IObserver<ISortAction> observer)
+        {
+            int pivot = items[low];
+            int i = low - 1;
+            int j = high + 1;
+            int temp;
+
+            var indices = new int[(high - low) + 1];
+            for (int idx = 0; idx < indices.Length; idx++)
+            {
+                indices[idx] = low + idx;
+            }
+            observer.OnNext(new SetAction
+            {
+                Indices = indices,
+                Items = items,
+            });
+            while (true)
+            {
+                do
+                {
+                    i = i + 1;
+                    observer.OnNext(new CompareAction
+                    {
+                        Index1 = i,
+                        Index2 = low,
+                        Items = items,
+                    });
+                } while (items[i] < pivot);
+                do
+                {
+                    j = j - 1;
+                    observer.OnNext(new CompareAction
+                    {
+                        Index1 = j,
+                        Index2 = low,
+                        Items = items,
+                    });
+                } while (items[j] > pivot);
+
+                if (i >= j )
+                {
+                    return j;
+                }
+
+                observer.OnNext(new SwapAction
+                {
+                    Index1 = j,
+                    Index2 = i,
+                    Items = items,
+                });
+                temp = items[i];
+                items[i] = items[j];
+                items[j] = temp;
+
+            }
         }
     }
 }
