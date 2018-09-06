@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,6 +21,8 @@ namespace VisualSortingAlgorithms
     public partial class MainForm : Form
     {
         private App _app = Program._app;
+        private BehaviorSubject<int> _stepTrigger = new BehaviorSubject<int>(App.DefaultStepDelay);
+        private BehaviorSubject<Unit> _visualizationTick = new BehaviorSubject<Unit>(Unit.Default);
 
         public MainForm()
         {
@@ -58,10 +63,24 @@ namespace VisualSortingAlgorithms
             //{
             //    Console.WriteLine($"Complete");
             //});
-
-            _app.OnStopVisualization.Subscribe(_ => startButton.Text = "&Start");
+            tableLayoutPanel1.Visible = false;
+            _app.OnStopVisualization.Subscribe(_ =>
+            {
+                startButton.Text = "&Start";
+                randomButton.Enabled = true;
+            });
             checkedListBox1.SetItemChecked(0, true);
             delayNumericUpDown.Value = App.DefaultStepDelay;
+
+            _stepTrigger.Select(t => Observable.Interval(TimeSpan.FromMilliseconds(t))).
+                Switch().Subscribe(_ =>
+                {
+                    Debug.WriteLine("tick-tack ");
+                    _visualizationTick.OnNext(Unit.Default);
+                });
+            //_visualizationTick = Observable.Timer(
+            //    TimeSpan.Zero,
+            //    TimeSpan.FromMilliseconds(StepDelay));
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -75,13 +94,15 @@ namespace VisualSortingAlgorithms
                 default:
                     _app.StartVisualization();
                     startButton.Text = "&Stop";
+                    randomButton.Enabled = false;
                     break;
             }
         }
         private void delayNumericUpDown_ValueChanged(object sender, EventArgs e)
         {
-            _app.SetStepDelay((int)delayNumericUpDown.Value);
-        }
+            var stepDelay = (int)delayNumericUpDown.Value;
+            _stepTrigger.OnNext(stepDelay);
+        }    
         private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             var name = checkedListBox1.Items[e.Index] as string;
@@ -90,6 +111,7 @@ namespace VisualSortingAlgorithms
                 GraphControl graphControl = GraphControl.Create();
                 SortAlgorithm sa = _app.CreateSortAlgorithm(name);
                 graphControl.SortAlgorithm = sa;
+                graphControl.VisualizationTick = _visualizationTick;
                 _app.AddGraph(graphControl);
                 mainFlowLayoutPanel.Controls.Add(graphControl);
             }
@@ -104,8 +126,7 @@ namespace VisualSortingAlgorithms
         }
         private void bigOGraphCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            _app.ShowBigOGraph();
-            // Observable.FromEvent()
+            //_app.ShowBigOGraph();
         }
         private void MainForm_Resize(object sender, EventArgs e)
         {

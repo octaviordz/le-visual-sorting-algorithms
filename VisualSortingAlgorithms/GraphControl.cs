@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Windows.Forms;
@@ -42,20 +44,6 @@ namespace VisualSortingAlgorithms
                 }
             }
         }
-        public int _stepDelay;
-        public int StepDelay
-        {
-            get
-            {
-                return _stepDelay;
-            }
-            set
-            {
-                _stepDelay = value;
-                _stepTrigger.OnNext(_stepDelay);
-            }
-        }
-        private BehaviorSubject<int> _stepTrigger = new BehaviorSubject<int>(App.DefaultStepDelay);
         public int[] Data
         {
             get
@@ -83,16 +71,14 @@ namespace VisualSortingAlgorithms
         }
         private Subject<bool> _visualizing = new Subject<bool>();
         public IObservable<bool> Visualizing => _visualizing;
-
+        public IObservable<Unit> VisualizationTick { get; set; }
         private IDisposable _unsubscribe = null;
+
         public GraphControl()
         {
             InitializeComponent();
         }
-        public void BigOGraph()
-        {
-
-        }
+        
         public void Start()
         {
             if (_unsubscribe != null)
@@ -244,9 +230,9 @@ namespace VisualSortingAlgorithms
                 }
                 return new List<Action>();
             });
-
-            var trigger = _stepTrigger.Select(t => Observable.Interval(TimeSpan.FromMilliseconds(t))).
-                Switch();
+            //var trigger = _stepTrigger.Select(t => Observable.Interval(TimeSpan.FromMilliseconds(t))).
+            //    Switch();
+            var trigger = VisualizationTick;
             //var trigger = Observable.Timer(
             //    TimeSpan.Zero,
             //    TimeSpan.FromMilliseconds(StepDelay));
@@ -255,20 +241,21 @@ namespace VisualSortingAlgorithms
                 it => it.Invoke(),
                 ex =>
                 {
-                    Console.WriteLine($"Error {ex}");
-                    _visualizing.OnNext(false);
+                    Debug.WriteLine($"Error {ex}");
+                    Stop();
                 },
                 () =>
                 {
-                    Console.WriteLine($"Complete");
-                    _visualizing.OnNext(false);
+                    Debug.WriteLine($"Complete");
+                    Stop();
                 });
             _visualizing.OnNext(true);
         }
         public void Stop()
         {
-            _unsubscribe?.Dispose();
+            using (_unsubscribe) { }
             _unsubscribe = null;
+            _visualizing.OnNext(false);
         }
         public static GraphControl Create()
         {

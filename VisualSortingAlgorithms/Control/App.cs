@@ -16,8 +16,7 @@ namespace VisualSortingAlgorithms.Control
     public class App
     {
         private List<IGraphControl> _graphControlList;
-        private int _stepDelay = DefaultStepDelay;
-        private static int XMax = 10;
+        private static int XMax = 30;
         public static int YMax = 1000;
         public static int DefaultStepDelay = 300;
 
@@ -36,14 +35,6 @@ namespace VisualSortingAlgorithms.Control
             _graphControlList = new List<IGraphControl>();
             _onStopVisualization = new Subject<Unit>();
             GenerateRandomSeries();
-        }
-        internal void SetStepDelay(int value)
-        {
-            _stepDelay = value;
-            foreach (var it in _graphControlList)
-            {
-                it.StepDelay = value;
-            }
         }
         internal void StopVisualization()
         {
@@ -115,8 +106,7 @@ namespace VisualSortingAlgorithms.Control
 
         internal void GenerateRandomSeries()
         {
-            //Random rand = new Random(DateTime.UtcNow.Millisecond);
-            Random rand = new Random(1);
+            Random rand = new Random(DateTime.UtcNow.Millisecond);
             var ymin = YMax / 10;
             for (int i = 0; i < XMax; i++)
             {
@@ -127,13 +117,6 @@ namespace VisualSortingAlgorithms.Control
             foreach (var it in _graphControlList)
             {
                 it.Data = Data;
-            }
-        }
-
-        internal void ShowBigOGraph()
-        {
-            foreach (var it in _graphControlList)
-            {
             }
         }
     }

@@ -8,14 +8,14 @@ using VisualSortingAlgorithms.Entities;
 using ZedGraph;
 using VisualSortingAlgorithms.Control;
 using System.Reactive.Subjects;
+using System.Reactive;
 
 namespace VisualSortingAlgorithms.Boundary
 {
     public interface IGraphControl
     {
         SortAlgorithm SortAlgorithm { get; set; }
-        int StepDelay { get; set; }
-        //Subject<bool> ShowBigOGraph { get; }
+        IObservable<Unit> VisualizationTick { get; set; }
         IObservable<bool> Visualizing { get; }
         int[] Data { get; set; }
 

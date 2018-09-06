@@ -94,7 +94,7 @@ namespace VisualSortingAlgorithms.Entities
             if (low < high)
             {
                 int middle = (low / 2) + (high / 2);
-                var indices = new int[(middle - low) + 1];
+                var indices = new int[(high - low) + 1];
                 for (int i = 0; i < indices.Length; i++)
                 {
                     indices[i] = low + i;
@@ -105,18 +105,17 @@ namespace VisualSortingAlgorithms.Entities
                     Items = input,
                 });
                 MergeSort(input, low, middle, observer);
-
-                indices = new int[(high - (middle + 1)) + 1];
+                MergeSort(input, middle + 1, high, observer);
+                indices = new int[(high - low) + 1];
                 for (int i = 0; i < indices.Length; i++)
                 {
-                    indices[i] = middle + 1 + i;
+                    indices[i] = low + i;
                 }
                 observer.OnNext(new SetAction
                 {
                     Indices = indices,
                     Items = input,
                 });
-                MergeSort(input, middle + 1, high, observer);
                 Merge(input, low, middle, high, observer);
             }
         }
@@ -128,6 +127,7 @@ namespace VisualSortingAlgorithms.Entities
             int right = middle + 1;
             int[] tmp = new int[(high - low) + 1];
             int tmpIndex = 0;
+            int shiftOnLeftCount = 0;
             while ((left <= middle) && (right <= high))
             {
                 observer.OnNext(new CompareAction
@@ -145,10 +145,11 @@ namespace VisualSortingAlgorithms.Entities
                 {
                     observer.OnNext(new SwapShiftAction
                     {
-                        Index1 = left + tmpIndex,
+                        Index1 = left + shiftOnLeftCount,
                         Index2 = right,
                         Items = tmp,
                     });
+                    shiftOnLeftCount += 1;
                     tmp[tmpIndex] = input[right];
                     right = right + 1;
                 }
