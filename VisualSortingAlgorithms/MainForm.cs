@@ -68,6 +68,7 @@ namespace VisualSortingAlgorithms
             {
                 startButton.Text = "&Start";
                 randomButton.Enabled = true;
+                checkedListBox1.Enabled = true;
             });
             checkedListBox1.SetItemChecked(0, true);
             delayNumericUpDown.Value = App.DefaultStepDelay;
@@ -95,6 +96,7 @@ namespace VisualSortingAlgorithms
                     _app.StartVisualization();
                     startButton.Text = "&Stop";
                     randomButton.Enabled = false;
+                    checkedListBox1.Enabled = false;
                     break;
             }
         }

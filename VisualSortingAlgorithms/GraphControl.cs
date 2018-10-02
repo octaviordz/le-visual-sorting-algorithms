@@ -256,6 +256,10 @@ namespace VisualSortingAlgorithms
             using (_unsubscribe) { }
             _unsubscribe = null;
             _visualizing.OnNext(false);
+            GraphPane.CurveList[0].Clear();
+            GraphPane.CurveList[1].Clear();
+            GraphPane.CurveList[2].Clear();
+            Invalidate();
         }
         public static GraphControl Create()
         {
