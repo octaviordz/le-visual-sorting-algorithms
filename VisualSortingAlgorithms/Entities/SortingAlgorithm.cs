@@ -118,8 +118,6 @@ namespace VisualSortingAlgorithms.Entities
         }
         private static void Merge(int[] items, int low, int middle, int high, IObserver<ISortAction> observer)
         {
-            List<int> result = new List<int>();
-
             int left = low;
             int right = middle + 1;
             int[] tmp = new int[(high - low) + 1];
@@ -253,7 +251,7 @@ namespace VisualSortingAlgorithms.Entities
                     });
                 } while (items[j] > pivot);
 
-                if (i >= j )
+                if (i >= j)
                 {
                     return j;
                 }

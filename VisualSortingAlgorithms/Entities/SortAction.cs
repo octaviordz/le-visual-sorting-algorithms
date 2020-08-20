@@ -14,35 +14,35 @@ namespace VisualSortingAlgorithms.Entities
         int[] Items { get; }
     }
 
-    class CompareAction: ISortAction
+    public class CompareAction: ISortAction
     {
         public int Index1 { get; set; }
         public int Index2 { get; set; }
         public int[] Indices { get; set; }
         public int[] Items { get; set; }
     }
-    class SwapAction : ISortAction
+    public class SwapAction : ISortAction
     {
         public int Index1 { get; set; }
         public int Index2 { get; set; }
         public int[] Indices { get; set; }
         public int[] Items { get; set; }
     }
-    class SwapShiftAction : ISortAction
+    public class SwapShiftAction : ISortAction
     {
         public int Index1 { get; set; }
         public int Index2 { get; set; }
         public int[] Indices { get; set; }
         public int[] Items { get; set; }
     }
-    class CompleteAction : ISortAction
+    public class CompleteAction : ISortAction
     {
         public int Index1 { get; set; }
         public int Index2 { get; set; }
         public int[] Indices { get; set; }
         public int[] Items { get; set; }
     }
-    class SetAction : ISortAction
+    public class SetAction : ISortAction
     {
         public int Index1 { get; set; }
         public int Index2 { get; set; }

@@ -1,8 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualSortingAlgorithms.Wpf", "VisualSortingAlgorithms.Wpf\VisualSortingAlgorithms.Wpf.csproj", "{984F9119-336C-4F7F-8B19-E86742102363}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualSortingAlgorithms", "VisualSortingAlgorithms\VisualSortingAlgorithms.csproj", "{AA704580-E286-4CEF-8494-6479219CF6D5}"
 EndProject
 Global
@@ -11,6 +13,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{984F9119-336C-4F7F-8B19-E86742102363}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{984F9119-336C-4F7F-8B19-E86742102363}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{984F9119-336C-4F7F-8B19-E86742102363}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{984F9119-336C-4F7F-8B19-E86742102363}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AA704580-E286-4CEF-8494-6479219CF6D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AA704580-E286-4CEF-8494-6479219CF6D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA704580-E286-4CEF-8494-6479219CF6D5}.Release|Any CPU.ActiveCfg = Release|Any CPU

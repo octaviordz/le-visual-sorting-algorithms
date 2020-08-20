@@ -36,7 +36,7 @@ namespace VisualSortingAlgorithms.Control
             _onStopVisualization = new Subject<Unit>();
             GenerateRandomSeries();
         }
-        internal void StopVisualization()
+        public void StopVisualization()
         {
             foreach (var it in _graphControlList)
             {
@@ -44,7 +44,7 @@ namespace VisualSortingAlgorithms.Control
             }
             _onStopVisualization.OnNext(Unit.Default);
         }
-        internal void StartVisualization()
+        public void StartVisualization()
         {
             var wn = _graphControlList.Count;
             int n = 0;
@@ -66,16 +66,16 @@ namespace VisualSortingAlgorithms.Control
                     });
             }
         }
-        internal IGraphControl FindGraph(string name)
+        public IGraphControl FindGraph(string name)
         {
-            return _graphControlList.Where(it => it.SortAlgorithm.Name == name).FirstOrDefault();
+            return _graphControlList.Where(it => it.SortAlgorithm.Name == name.ToUpperInvariant()).FirstOrDefault();
         }
-        internal void AddGraph(IGraphControl graphControl)
+        public void AddGraph(IGraphControl graphControl)
         {
             _graphControlList.Add(graphControl);
             graphControl.Data = Data;
         }
-        internal void RemoveGraph(IGraphControl graphControl)
+        public void RemoveGraph(IGraphControl graphControl)
         {
             _graphControlList.Remove(graphControl);
         }
@@ -84,7 +84,7 @@ namespace VisualSortingAlgorithms.Control
             var n = name.ToUpperInvariant();
             var result = new SortAlgorithm
             {
-                Name = name,
+                Name = n,
             };
             switch (n)
             {
@@ -100,13 +100,16 @@ namespace VisualSortingAlgorithms.Control
                     result.SortFunc = SortingAlgorithm.Bubble;
                     result.BigOFunc = SortingAlgorithm.BubbleBigO;
                     break;
+                default:
+                    throw new NotImplementedException($"Sorting algorithm '{n}' not implemented");
             }
             return result;
         }
 
         internal void GenerateRandomSeries()
         {
-            Random rand = new Random(DateTime.UtcNow.Millisecond);
+            //Random rand = new Random(DateTime.UtcNow.Millisecond);
+            Random rand = new Random(1);
             var ymin = YMax / 10;
             for (int i = 0; i < XMax; i++)
             {
