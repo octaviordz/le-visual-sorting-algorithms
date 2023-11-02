@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2016
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualSortingAlgorithms.Wpf", "VisualSortingAlgorithms.Wpf\VisualSortingAlgorithms.Wpf.csproj", "{984F9119-336C-4F7F-8B19-E86742102363}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualSortingAlgorithms", "VisualSortingAlgorithms\VisualSortingAlgorithms.csproj", "{AA704580-E286-4CEF-8494-6479219CF6D5}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SortingAlgorithms", "SortingAlgorithms\SortingAlgorithms.fsproj", "{5CDDFA70-D8CF-4DF3-87B4-6F8146308888}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SortingAlgorithms.Test", "SortingAlgorithms.Test\SortingAlgorithms.Test.fsproj", "{3045BCE7-06DB-49A0-93F2-A5742520EE46}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{AA704580-E286-4CEF-8494-6479219CF6D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA704580-E286-4CEF-8494-6479219CF6D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA704580-E286-4CEF-8494-6479219CF6D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CDDFA70-D8CF-4DF3-87B4-6F8146308888}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CDDFA70-D8CF-4DF3-87B4-6F8146308888}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CDDFA70-D8CF-4DF3-87B4-6F8146308888}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CDDFA70-D8CF-4DF3-87B4-6F8146308888}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3045BCE7-06DB-49A0-93F2-A5742520EE46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3045BCE7-06DB-49A0-93F2-A5742520EE46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3045BCE7-06DB-49A0-93F2-A5742520EE46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3045BCE7-06DB-49A0-93F2-A5742520EE46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

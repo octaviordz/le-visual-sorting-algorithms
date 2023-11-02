@@ -102,7 +102,7 @@ namespace VisualSortingAlgorithms
         {
             var stepDelay = (int)delayNumericUpDown.Value;
             _stepTrigger.OnNext(stepDelay);
-        }    
+        }
         private void checkedListBox1_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             var name = checkedListBox1.Items[e.Index] as string;

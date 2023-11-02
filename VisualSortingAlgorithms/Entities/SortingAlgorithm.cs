@@ -214,6 +214,7 @@ namespace VisualSortingAlgorithms.Entities
         private static int Partition(int[] items, int low, int high, IObserver<ISortAction> observer)
         {
             int pivot = items[low];
+            int pivotIndx = low;
             int i = low - 1;
             int j = high + 1;
             int temp;
@@ -236,7 +237,7 @@ namespace VisualSortingAlgorithms.Entities
                     observer.OnNext(new CompareAction
                     {
                         Index1 = i,
-                        Index2 = low,
+                        Index2 = pivotIndx,
                         Items = items,
                     });
                 } while (items[i] < pivot);
@@ -246,7 +247,7 @@ namespace VisualSortingAlgorithms.Entities
                     observer.OnNext(new CompareAction
                     {
                         Index1 = j,
-                        Index2 = low,
+                        Index2 = pivotIndx,
                         Items = items,
                     });
                 } while (items[j] > pivot);
@@ -265,7 +266,7 @@ namespace VisualSortingAlgorithms.Entities
                 temp = items[i];
                 items[i] = items[j];
                 items[j] = temp;
-
+                pivotIndx = j;
             }
         }
     }
