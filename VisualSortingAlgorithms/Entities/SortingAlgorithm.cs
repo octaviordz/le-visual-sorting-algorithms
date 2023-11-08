@@ -166,7 +166,7 @@ namespace VisualSortingAlgorithms.Entities
                 right = right + 1;
                 tmpIndex = tmpIndex + 1;
             }
-            
+
             for (int i = 0; i < tmp.Length; i++)
             {
                 items[low + i] = tmp[i];
@@ -253,7 +253,7 @@ namespace VisualSortingAlgorithms.Entities
                     });
                 } while (items[j] > pivot);
 
-                if (i >= j )
+                if (i >= j)
                 {
                     return j;
                 }
@@ -267,8 +267,71 @@ namespace VisualSortingAlgorithms.Entities
                 temp = items[i];
                 items[i] = items[j];
                 items[j] = temp;
-
             }
+        }
+
+        public static IObservable<ISortAction> HeapSort(int[] items)
+        {
+            return Observable.Create<ISortAction>(observer =>
+            {
+                int length = items.Length;
+
+                // Build max heap
+                for (int i = length / 2 - 1; i >= 0; i--)
+                {
+                    Heapify(items, length, i, observer);
+                }
+
+                // Heap sort
+                for (int i = length - 1; i >= 0; i--)
+                {
+                    Swap(items, 0, i, observer);
+
+                    // Heapify root element
+                    Heapify(items, i, 0, observer);
+                }
+
+                observer.OnCompleted();
+                return Disposable.Create(() => Debug.WriteLine($"{nameof(HeapSort)}. Observer has unsubscribed"));
+                //return Disposable.Empty;
+            });
+        }
+
+        private static void Heapify(int[] items, int length, int i, IObserver<ISortAction> observer)
+        {
+            int largest = i;
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+
+            if (left < length && items[left] > items[largest])
+            {
+                largest = left;
+            }
+
+            if (right < length && items[right] > items[largest])
+            {
+                largest = right;
+            }
+
+            if (largest != i)
+            {
+                Swap(items, i, largest, observer);
+                Heapify(items, length, largest, observer);
+            }
+        }
+
+        private static void Swap(int[] items, int i, int j, IObserver<ISortAction> observer)
+        {
+            int temp = items[i];
+            items[i] = items[j];
+            items[j] = temp;
+
+            observer.OnNext(new SwapAction
+            {
+                Index1 = i,
+                Index2 = j,
+                Items = items
+            });
         }
     }
 }

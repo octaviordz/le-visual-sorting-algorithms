@@ -12,6 +12,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Reactive" Version="4.4.1" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WinForms" Version="2.0.0-rc1.2" />
     <PackageReference Include="ZedGraph" Version="6.0.0-alpha0001" />
     <PackageReference Include="ZedGraph.WinForms" Version="6.0.0-alpha0001" />
   </ItemGroup>
